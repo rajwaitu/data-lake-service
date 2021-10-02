@@ -1,0 +1,8 @@
+qddate
+requests
+SQLAlchemy
+fastapi
+pymysql
+pymongo
+gunicorn
+uvicorn
