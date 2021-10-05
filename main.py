@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI,Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 import services.userService as userservice
 import services.holdingService as holdingservice
@@ -22,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class StockLTP(BaseModel):
+    stockLTPs: dict
+
 
 @app.exception_handler(error.APIError)
 async def unicorn_exception_handler(request: Request, exc: error.APIError):
@@ -50,7 +55,7 @@ def getUserByEmail(email):
 
 @app.get("/v1/api/user/{email}/portfolio")
 def getUserPortfolio(email):
-     return holdingservice.getUserPortfolio(email)
+     return userservice.getUserPortfolio(email)
 
 @app.get("/v1/api/user/portfolio/{id}")
 def getUserPortfolioById(id):
@@ -65,8 +70,8 @@ def getUserInvestment(email,portfolio_id):
     return investmentservice.getInvestment(email,portfolio_id)
 
 @app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
-def createUserInvestment(email,portfolio_id):
-    return investmentservice.createInvestment(email,portfolio_id)
+def createUserInvestment(email,portfolio_id,stockLTP:StockLTP):
+    return investmentservice.createInvestment(email,portfolio_id,stockLTP)
 
 @app.get("/v1/api/user/{email}/watchlist")
 def getUserWatchlist(email):

@@ -9,7 +9,7 @@ from sqlalchemy.sql.sqltypes import Date, Float
 
 from exception.apiError import APIError
 
-engine = create_engine("mysql+pymysql://app:rajwaitu@localhost:3306/stock_holding_db?charset=utf8mb4")
+engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db?charset=utf8mb4")
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
@@ -137,6 +137,14 @@ def getInvestmentByUserAndUserPortfolio(user_subscription_id,portfolio_id):
     session = Session()
     user_investment_list = session.query(UserInvestment).filter(UserInvestment.user == user_subscription_id,UserInvestment.userPortfolio == portfolio_id).all()
     return user_investment_list;
+
+def createInvestment(userInvestment):
+    session = Session()
+    try:
+     session.add(userInvestment)
+     session.commit()
+    finally:
+     session.close()
 
 def getUserWatchList(user_subscription_id):
     session = Session()
