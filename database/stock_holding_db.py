@@ -1,15 +1,22 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload
-from sqlalchemy.sql import select,insert
+from sqlalchemy.sql import select,insert,case
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 import datetime
 from sqlalchemy.sql.sqltypes import Date, Float
 
 from exception.apiError import APIError
+import traceback
+import config.app_env as env
 
-engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db?charset=utf8mb4")
+if env.mysql_instance == 'local':
+    engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db_local?charset=utf8mb4",pool_size=10,max_overflow=20)
+elif env.mysql_instance == 'gcp':
+    engine = create_engine("mysql+pymysql://root:rajwaitu@localhost:3309/stock_holding_db?charset=utf8mb4",pool_size=10,max_overflow=20)
+
+#engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db?charset=utf8mb4",pool_size=10,max_overflow=20)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
@@ -56,8 +63,11 @@ class UserHolding(Base):
     stockCode = Column('symbol',String)
     holdingQuantity = Column('quantity',Integer)
     avaragePrice = Column('avarage_price',Float)
-    user = Column('subscription_id',Integer, ForeignKey('users.subscription_id'))
+    user = Column('subscription_id',String, ForeignKey('users.subscription_id'))
     userPortfolio = Column('portfolio',Integer, ForeignKey('user_portfolio.id'))
+    ltp = Column(Float)
+    maxima = Column(Float)
+    depth = Column(Float)
 
 class UserInvestment(Base):
     __tablename__ = 'investment'
@@ -145,6 +155,43 @@ def createInvestment(userInvestment):
      session.commit()
     finally:
      session.close()
+
+def updateHoldingLTP(ltpDict):
+    session = Session()
+    try:
+        session.query(UserHolding).filter(UserHolding.id.in_(ltpDict)).update({
+        UserHolding.ltp: case(ltpDict,value=UserHolding.id)}, synchronize_session=False)
+        session.commit()
+    except Exception:
+        print(traceback.format_exc())
+        session.rollback()
+    finally:
+     session.close()
+
+def updateHoldingMaxima(maximaDict):
+    session = Session()
+    try:
+        session.query(UserHolding).filter(UserHolding.id.in_(maximaDict)).update({
+        UserHolding.maxima: case(maximaDict,value=UserHolding.id)}, synchronize_session=False)
+        session.commit()
+    except Exception:
+        print(traceback.format_exc())
+        session.rollback()
+    finally:
+     session.close()
+
+def updateHoldingDepth(depthDict):
+    session = Session()
+    try:
+        session.query(UserHolding).filter(UserHolding.id.in_(depthDict)).update({
+        UserHolding.depth: case(depthDict,value=UserHolding.id)}, synchronize_session=False)
+        session.commit()
+    except Exception:
+        print(traceback.format_exc())
+        session.rollback()
+    finally:
+     session.close()
+
 
 def getUserWatchList(user_subscription_id):
     session = Session()

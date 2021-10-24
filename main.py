@@ -27,6 +27,9 @@ app.add_middleware(
 class StockLTP(BaseModel):
     stockLTPs: dict
 
+class HoldingList(BaseModel):
+    holdingList: list
+
 
 @app.exception_handler(error.APIError)
 async def unicorn_exception_handler(request: Request, exc: error.APIError):
@@ -65,6 +68,10 @@ def getUserPortfolioById(id):
 def getUserHolding(email,portfolio_id):
     return holdingservice.getHolding(email,portfolio_id)
 
+@app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def createUserHolding(email,portfolio_id,holdingList:HoldingList):
+    return holdingservice.createOrUpdateHolding(email,portfolio_id,holdingList)
+
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def getUserInvestment(email,portfolio_id):
     return investmentservice.getInvestment(email,portfolio_id)
@@ -78,5 +85,5 @@ def getUserWatchlist(email):
     return watchlistService.getUserWatchList(email)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001,reload=True)
 
