@@ -1,2 +1,2 @@
-#local/gcp
-mysql_instance = 'local'
+#local/vm
+mysql_instance = 'vm'

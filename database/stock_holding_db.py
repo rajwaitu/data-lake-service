@@ -13,8 +13,8 @@ import config.app_env as env
 
 if env.mysql_instance == 'local':
     engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db_local?charset=utf8mb4",pool_size=10,max_overflow=20)
-elif env.mysql_instance == 'gcp':
-    engine = create_engine("mysql+pymysql://root:rajwaitu@localhost:3309/stock_holding_db?charset=utf8mb4",pool_size=10,max_overflow=20)
+elif env.mysql_instance == 'vm':
+    engine = create_engine("mysql+pymysql://app:rajwaitu@localhost:3306/stock_holding_db?charset=utf8mb4",pool_size=10,max_overflow=20)
 
 #engine = create_engine("mysql+pymysql://root:root@localhost:3306/stock_holding_db?charset=utf8mb4",pool_size=10,max_overflow=20)
 Session = sessionmaker(bind=engine)
