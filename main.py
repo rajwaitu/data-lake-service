@@ -10,6 +10,7 @@ import services.userService as userservice
 import services.holdingService as holdingservice
 import services.investmentService as investmentservice
 import services.watchlistService as watchlistService
+import services.stockService as stockService
 import exception.apiError as error
 
 app = FastAPI()
@@ -84,6 +85,9 @@ def createUserInvestment(email,portfolio_id,stockLTP:StockLTP):
 def getUserWatchlist(email):
     return watchlistService.getUserWatchList(email)
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001,reload=True)
+# Stock API Endpoints
+@app.get("/v1/api/stock/trend/{trend}/period/{period}")
+def getStocks(period,trend):
+    return stockService.getStock(period,trend)
+
 
