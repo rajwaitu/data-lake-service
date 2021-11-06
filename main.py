@@ -69,9 +69,13 @@ def getUserPortfolioById(id):
 def getUserHolding(email,portfolio_id):
     return holdingservice.getHolding(email,portfolio_id)
 
+@app.put("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def updateUserHolding(email,portfolio_id,holdingList:HoldingList):
+    return holdingservice.updateHolding(email,portfolio_id,holdingList)
+
 @app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
 def createUserHolding(email,portfolio_id,holdingList:HoldingList):
-    return holdingservice.createOrUpdateHolding(email,portfolio_id,holdingList)
+    return holdingservice.createHolding(email,portfolio_id,holdingList)
 
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def getUserInvestment(email,portfolio_id):
@@ -89,5 +93,4 @@ def getUserWatchlist(email):
 @app.get("/v1/api/stock/trend/{trend}/period/{period}")
 def getStocks(period,trend):
     return stockService.getStock(period,trend)
-
 

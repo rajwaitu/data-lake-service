@@ -13,7 +13,7 @@ def getHolding(email,portfolioId):
       print(traceback.format_exc())
       raise APIError(statusCode = 400, message = 'error occured while loading user holdings' )
 
-def createOrUpdateHolding(email,portfolioId,holdingListObj):
+def updateHolding(email,portfolioId,holdingListObj):
   try:
       user = db.getUserByEmail(email)
       user_portfolio = db.getUserPortfolioById(int(portfolioId))
@@ -34,6 +34,28 @@ def createOrUpdateHolding(email,portfolioId,holdingListObj):
   except Exception :
       print(traceback.format_exc())
       raise APIError(statusCode = 400, message = 'error occured while creating/updating user holdings' )
+
+def createHolding(email,portfolioId,holdingListObj):
+  try:
+      user = db.getUserByEmail(email)
+      db.getUserPortfolioById(int(portfolioId))
+     
+      for holdingDict in holdingListObj.holdingList:
+        holding = db.UserHolding()
+        holding.user = user.subscription_id
+        holding.userPortfolio = int(portfolioId)
+        holding.stockCode = str(holdingDict['scrip'])
+        holding.company = str(holdingDict['company'])
+        holding.holdingQuantity = int(holdingDict['quantity'])
+        holding.avaragePrice = float(holdingDict['avgPrice'])
+        holding.ltp = float(holdingDict['ltp'])
+        db.addHolding(holding)
+
+      return {'status' : 200}
+        
+  except Exception :
+      print(traceback.format_exc())
+      raise APIError(statusCode = 400, message = 'error occured while creating user holdings' )
 
 
 

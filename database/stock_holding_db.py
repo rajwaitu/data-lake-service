@@ -156,6 +156,14 @@ def createInvestment(userInvestment):
     finally:
      session.close()
 
+def addHolding(userHolding):
+    session = Session()
+    try:
+     session.add(userHolding)
+     session.commit()
+    finally:
+     session.close()
+
 def updateHoldingLTP(ltpDict):
     session = Session()
     try:
