@@ -15,21 +15,48 @@ def getHolding(email,portfolioId):
 
 def updateHolding(email,portfolioId,holdingListObj):
   try:
-      user = db.getUserByEmail(email)
-      user_portfolio = db.getUserPortfolioById(int(portfolioId))
+      db.getUserByEmail(email)
+      db.getUserPortfolioById(int(portfolioId))
       ltpDict = {}
       maximaDict = {}
       depthDict = {}
+      quantityDict = {}
+      avgpriceDict = {}
 
       for holdingDict in holdingListObj.holdingList:
-        id = int(holdingDict['id'])
-        ltpDict[id] = float(holdingDict['ltp'])
-        maximaDict[id] = float(holdingDict['maxima'])
-        depthDict[id] = float(holdingDict['depth'])
+          id = int(holdingDict['id'])
 
-      db.updateHoldingLTP(ltpDict)
-      db.updateHoldingMaxima(maximaDict)
-      db.updateHoldingDepth(depthDict)
+          if "ltp" in holdingDict:
+            ltpDict[id] = float(holdingDict['ltp'])
+
+          if "maxima" in holdingDict:
+            maximaDict[id] = float(holdingDict['maxima'])
+
+          if "depth" in holdingDict:
+            depthDict[id] = float(holdingDict['depth'])
+
+          if "quantity" in holdingDict:
+            quantityDict[id] = int(holdingDict['quantity'])
+
+          if "avgprice" in holdingDict:
+            avgpriceDict[id] = float(holdingDict['avgprice'])
+        
+      if ltpDict:
+        db.updateHoldingLTP(ltpDict)
+      
+      if maximaDict:
+        db.updateHoldingMaxima(maximaDict)
+
+      if depthDict:
+        db.updateHoldingDepth(depthDict)
+
+      if quantityDict:
+        db.updateHoldingQuantity(quantityDict)
+
+      if avgpriceDict:
+        db.updateHoldingAvgprice(avgpriceDict)
+        
+      return {'status' : 200}
         
   except Exception :
       print(traceback.format_exc())
@@ -51,6 +78,18 @@ def createHolding(email,portfolioId,holdingListObj):
         holding.ltp = float(holdingDict['ltp'])
         db.addHolding(holding)
 
+      return {'status' : 200}
+        
+  except Exception :
+      print(traceback.format_exc())
+      raise APIError(statusCode = 400, message = 'error occured while creating user holdings' )
+
+def deleteHolding(email,portfolioId,scripObj):
+  try:
+      user = db.getUserByEmail(email)
+      db.getUserPortfolioById(int(portfolioId))
+
+      db.deleteHolding(user.subscription_id,int(portfolioId),str(scripObj.scrip))
       return {'status' : 200}
         
   except Exception :

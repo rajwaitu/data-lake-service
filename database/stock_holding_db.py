@@ -164,6 +164,14 @@ def addHolding(userHolding):
     finally:
      session.close()
 
+def deleteHolding(user_subscription_id,portfolio_id,scrip):
+    session = Session()
+    try:
+     session.query(UserHolding).filter(UserHolding.user == user_subscription_id,UserHolding.userPortfolio == portfolio_id,UserHolding.stockCode == scrip).delete()
+     session.commit()
+    finally:
+     session.close()
+
 def updateHoldingLTP(ltpDict):
     session = Session()
     try:
@@ -193,6 +201,30 @@ def updateHoldingDepth(depthDict):
     try:
         session.query(UserHolding).filter(UserHolding.id.in_(depthDict)).update({
         UserHolding.depth: case(depthDict,value=UserHolding.id)}, synchronize_session=False)
+        session.commit()
+    except Exception:
+        print(traceback.format_exc())
+        session.rollback()
+    finally:
+     session.close()
+
+def updateHoldingQuantity(quantityDict):
+    session = Session()
+    try:
+        session.query(UserHolding).filter(UserHolding.id.in_(quantityDict)).update({
+        UserHolding.holdingQuantity: case(quantityDict,value=UserHolding.id)}, synchronize_session=False)
+        session.commit()
+    except Exception:
+        print(traceback.format_exc())
+        session.rollback()
+    finally:
+     session.close()
+
+def updateHoldingAvgprice(avgpriceDict):
+    session = Session()
+    try:
+        session.query(UserHolding).filter(UserHolding.id.in_(avgpriceDict)).update({
+        UserHolding.avaragePrice: case(avgpriceDict,value=UserHolding.id)}, synchronize_session=False)
         session.commit()
     except Exception:
         print(traceback.format_exc())

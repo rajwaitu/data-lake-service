@@ -24,12 +24,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 class StockLTP(BaseModel):
     stockLTPs: dict
-
 class HoldingList(BaseModel):
     holdingList: list
+class Scrip(BaseModel):
+    scrip: str
 
 
 @app.exception_handler(error.APIError)
@@ -77,6 +77,10 @@ def updateUserHolding(email,portfolio_id,holdingList:HoldingList):
 def createUserHolding(email,portfolio_id,holdingList:HoldingList):
     return holdingservice.createHolding(email,portfolio_id,holdingList)
 
+@app.delete("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def deleteUserHolding(email,portfolio_id,scrip:Scrip):
+    return holdingservice.deleteHolding(email,portfolio_id,scrip)
+
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def getUserInvestment(email,portfolio_id):
     return investmentservice.getInvestment(email,portfolio_id)
@@ -93,4 +97,5 @@ def getUserWatchlist(email):
 @app.get("/v1/api/stock/trend/{trend}/period/{period}")
 def getStocks(period,trend):
     return stockService.getStock(period,trend)
+
 
